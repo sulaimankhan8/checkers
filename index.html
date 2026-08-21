@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#140c08" />
+    <title>Checkers Master - Mobile Edition</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="theme-wood screen-home">
+    <!-- SVG ICON SPRITE SYMBOL DEFINITIONS (Properly Scalable ViewBox) -->
+    <svg style="display: none;">
+        <defs>
+            <!-- Crown Icon -->
+            <symbol id="icon-crown" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+            </symbol>
+            <!-- Robot AI Icon -->
+            <symbol id="icon-robot" viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 7v4M8 15h.01M16 15h.01M9 18h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <!-- User / Player Icon -->
+            <symbol id="icon-user" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="12" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+            </symbol>
+            <!-- 2 Players Icon -->
+            <symbol id="icon-users" viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="9" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <!-- Brain / AI Hard Icon -->
+            <symbol id="icon-brain" viewBox="0 0 24 24">
+                <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <!-- Sound On Icon -->
+            <symbol id="icon-volume-on" viewBox="0 0 24 24">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <!-- Sound Off Icon -->
+            <symbol id="icon-volume-off" viewBox="0 0 24 24">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <!-- Undo Icon -->
+            <symbol id="icon-undo" viewBox="0 0 24 24">
+                <path d="M3 7v6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <!-- Lightbulb Hint Icon -->
+            <symbol id="icon-hint" viewBox="0 0 24 24">
+                <path d="M9 18h6M10 22h4M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1.55.6 2.91 1.5 3.5.76.76 1.23 1.52 1.41 2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <!-- Restart / Refresh Icon -->
+            <symbol id="icon-restart" viewBox="0 0 24 24">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- Trophy Victory Icon -->
+            <symbol id="icon-trophy" viewBox="0 0 24 24">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M2 22h20M12 17v5M12 17a7 7 0 0 0 7-7V3H5v7a7 7 0 0 0 7 7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- Defeat / Crossbones Skull Icon -->
+            <symbol id="icon-defeat" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <!-- Home Menu Icon -->
+            <symbol id="icon-home" viewBox="0 0 24 24">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="9 22 9 12 15 12 15 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <!-- Move Log History Icon -->
+            <symbol id="icon-history" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <!-- Play Arrow Icon -->
+            <symbol id="icon-play" viewBox="0 0 24 24">
+                <polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/>
+            </symbol>
+            <!-- Close Icon -->
+            <symbol id="icon-close" viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+        </defs>
+    </svg>
+
+    <div class="app-container">
+        <!-- ============================================
+             HOME SCREEN (MAIN MENU)
+             ============================================ -->
+        <section id="homeScreen" class="screen-container active">
+            <div class="home-hero">
+                <div class="home-logo-badge">
+                    <svg class="svg-icon logo-crown"><use href="#icon-crown"></use></svg>
+                </div>
+                <h1 class="home-title">CHECKERS MASTER</h1>
+                <p class="home-subtitle">Strategy & Victory</p>
+            </div>
+
+            <div class="home-menu-card">
+                <!-- Mode Selector -->
+                <div class="menu-section">
+                    <label class="menu-label">Game Mode</label>
+                    <div class="mode-options-grid">
+                        <button type="button" class="mode-card active" data-mode="ai-easy">
+                            <svg class="svg-icon"><use href="#icon-robot"></use></svg>
+                            <span>vs Computer</span>
+                            <small>Easy AI</small>
+                        </button>
+                        <button type="button" class="mode-card" data-mode="ai-hard">
+                            <svg class="svg-icon"><use href="#icon-brain"></use></svg>
+                            <span>vs Computer</span>
+                            <small>Hard AI</small>
+                        </button>
+                        <button type="button" class="mode-card" data-mode="pvp">
+                            <svg class="svg-icon"><use href="#icon-users"></use></svg>
+                            <span>Pass & Play</span>
+                            <small>2 Players</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Theme Selector -->
+                <div class="menu-section">
+                    <label class="menu-label">Board Theme</label>
+                    <div class="theme-pills">
+                        <button type="button" class="theme-pill active" data-theme="wood">Mahogany</button>
+                        <button type="button" class="theme-pill" data-theme="neon">Cyber Neon</button>
+                        <button type="button" class="theme-pill" data-theme="marble">Marble</button>
+                    </div>
+                </div>
+
+                <!-- Sound & Quick Settings -->
+                <div class="menu-row">
+                    <button id="homeSoundToggleBtn" class="icon-btn-text" type="button">
+                        <svg id="homeSoundIcon" class="svg-icon"><use href="#icon-volume-on"></use></svg>
+                        <span>Sound FX</span>
+                    </button>
+                </div>
+
+                <!-- Play Button -->
+                <button id="startGameBtn" class="btn btn-primary btn-play-main" type="button">
+                    <svg class="svg-icon"><use href="#icon-play"></use></svg>
+                    <span>START GAME</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ============================================
+             GAMEPLAY SCREEN
+             ============================================ -->
+        <section id="gameScreen" class="screen-container">
+            <!-- GAME HEADER TOOLBAR -->
+            <header class="game-header">
+                <button id="backToHomeBtn" class="icon-btn" title="Main Menu">
+                    <svg class="svg-icon"><use href="#icon-home"></use></svg>
+                </button>
+
+                <div class="game-header-title">
+                    <svg class="svg-icon header-mini-crown"><use href="#icon-crown"></use></svg>
+                    <span id="headerModeLabel">vs AI Easy</span>
+                </div>
+
+                <div class="header-right-actions">
+                    <button id="gameSoundToggleBtn" class="icon-btn" title="Toggle Sound">
+                        <svg id="gameSoundIcon" class="svg-icon"><use href="#icon-volume-on"></use></svg>
+                    </button>
+                    <button id="restartBtn" class="icon-btn" title="Restart Game">
+                        <svg class="svg-icon"><use href="#icon-restart"></use></svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- MAIN GAME ARENA -->
+            <main class="game-arena">
+                <!-- PLAYER 2 / COMPUTER PANEL (TOP) -->
+                <div class="player-card player-dark" id="playerDarkCard">
+                    <div class="player-avatar">
+                        <span id="darkAvatarIcon" class="avatar-svg-wrap">
+                            <svg class="svg-icon"><use href="#icon-robot"></use></svg>
+                        </span>
+                    </div>
+                    <div class="player-info">
+                        <h2 class="player-name" id="darkPlayerName">Computer</h2>
+                        <div class="player-score-container">
+                            <span class="score-label">Pieces:</span>
+                            <span class="score-value" id="darkPieceCount">12</span>
+                        </div>
+                    </div>
+                    <div class="captured-container" id="darkCapturedContainer">
+                        <!-- Captured Red pieces shown here -->
+                    </div>
+                    <div class="turn-badge" id="darkTurnBadge">Waiting</div>
+                </div>
+
+                <!-- BOARD WRAPPER -->
+                <div class="board-wrapper">
+                    <!-- Turn Status & Gameplay Actions Bar -->
+                    <div class="board-header-bar">
+                        <div class="turn-banner" id="turnBanner">
+                            <span class="turn-dot red-dot"></span>
+                            <span id="turnText">Red Player's Turn</span>
+                        </div>
+                        <div class="board-action-buttons">
+                            <button id="undoBtn" class="btn btn-secondary btn-sm" title="Undo Move" disabled>
+                                <svg class="svg-icon"><use href="#icon-undo"></use></svg>
+                                <span>Undo</span>
+                            </button>
+                            <button id="hintBtn" class="btn btn-secondary btn-sm" title="Show Best Move Hint">
+                                <svg class="svg-icon"><use href="#icon-hint"></use></svg>
+                                <span>Hint</span>
+                            </button>
+                            <button id="toggleLogBtn" class="btn btn-secondary btn-sm" title="Move History">
+                                <svg class="svg-icon"><use href="#icon-history"></use></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Responsive Square Checkers Board -->
+                    <div class="board-frame" id="boardFrame">
+                        <div class="checkers-board" id="checkersBoard">
+                            <!-- 8x8 Board cells & pieces rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PLAYER 1 (RED) PANEL (BOTTOM) -->
+                <div class="player-card player-red active-turn" id="playerRedCard">
+                    <div class="player-avatar">
+                        <span class="avatar-svg-wrap">
+                            <svg class="svg-icon"><use href="#icon-crown"></use></svg>
+                        </span>
+                    </div>
+                    <div class="player-info">
+                        <h2 class="player-name" id="redPlayerName">Player (Red)</h2>
+                        <div class="player-score-container">
+                            <span class="score-label">Pieces:</span>
+                            <span class="score-value" id="redPieceCount">12</span>
+                        </div>
+                    </div>
+                    <div class="captured-container" id="redCapturedContainer">
+                        <!-- Captured Black pieces shown here -->
+                    </div>
+                    <div class="turn-badge" id="redTurnBadge">Your Turn</div>
+                </div>
+            </main>
+        </section>
+    </div>
+
+    <!-- ============================================
+         MOVE HISTORY DRAWER / SHEET
+         ============================================ -->
+    <div id="moveLogDrawer" class="move-log-drawer">
+        <div class="drawer-header">
+            <h3>
+                <svg class="svg-icon"><use href="#icon-history"></use></svg>
+                <span>Move History</span>
+            </h3>
+            <button id="closeLogBtn" class="icon-btn-sm" type="button">
+                <svg class="svg-icon"><use href="#icon-close"></use></svg>
+            </button>
+        </div>
+        <div class="move-log-list" id="moveLogList">
+            <div class="move-log-empty">Game started. Red to move.</div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         WINNER / DEFEAT MODAL
+         ============================================ -->
+    <div id="winModal" class="modal-overlay">
+        <div class="modal-box" id="modalBox">
+            <div class="modal-icon-badge" id="winIconContainer">
+                <svg id="winIconSvg" class="svg-icon modal-main-icon"><use href="#icon-trophy"></use></svg>
+            </div>
+            <h2 class="modal-title" id="winTitle">VICTORY!</h2>
+            <p class="modal-subtitle" id="winSubtitle">Outstanding strategy and dominant moves!</p>
+            
+            <div class="win-stats-grid">
+                <div class="win-stat-item">
+                    <span class="win-stat-num" id="winMovesCount">0</span>
+                    <span class="win-stat-lbl">Moves</span>
+                </div>
+                <div class="win-stat-item">
+                    <span class="win-stat-num" id="winCapturesCount">0</span>
+                    <span class="win-stat-lbl">Captures</span>
+                </div>
+                <div class="win-stat-item">
+                    <span class="win-stat-num" id="winKingsCount">0</span>
+                    <span class="win-stat-lbl">Kings</span>
+                </div>
+            </div>
+
+            <div class="modal-actions-row">
+                <button id="modalPlayAgainBtn" class="btn btn-primary btn-lg">
+                    <svg class="svg-icon"><use href="#icon-restart"></use></svg>
+                    <span>Play Again</span>
+                </button>
+                <button id="modalHomeBtn" class="btn btn-secondary btn-lg">
+                    <svg class="svg-icon"><use href="#icon-home"></use></svg>
+                    <span>Main Menu</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFETTI CANVAS -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- SCRIPTS -->
+    <script type="module" src="js/audio.js"></script>
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="js/ai.js"></script>
+    <script type="module" src="js/ui.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
