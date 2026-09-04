@@ -51,6 +51,8 @@ export class CheckersUI {
             winKingsCount: document.getElementById('winKingsCount'),
             darkAvatarIcon: document.getElementById('darkAvatarIcon'),
             darkPlayerName: document.getElementById('darkPlayerName'),
+            redTurnBadge: document.getElementById('redTurnBadge'),
+            darkTurnBadge: document.getElementById('darkTurnBadge'),
             confettiCanvas: document.getElementById('confettiCanvas')
         };
 
@@ -199,7 +201,7 @@ export class CheckersUI {
             const isHard = mode === 'ai-hard';
             this.elements.headerModeLabel.textContent = isHard ? 'vs AI (Hard)' : 'vs AI (Easy)';
             this.elements.darkAvatarIcon.innerHTML = `<svg class="svg-icon"><use href="#icon-${isHard ? 'brain' : 'robot'}"></use></svg>`;
-            this.elements.darkPlayerName.textContent = isHard ? 'Computer (Hard)' : 'Computer (Easy)';
+            this.elements.darkPlayerName.textContent = isHard ? 'Computer (Dark - Hard)' : 'Computer (Dark - Easy)';
         } else {
             this.elements.headerModeLabel.textContent = 'Pass & Play';
             this.elements.darkAvatarIcon.innerHTML = `<svg class="svg-icon"><use href="#icon-user"></use></svg>`;
@@ -288,9 +290,14 @@ export class CheckersUI {
 
             // Render AI Hint highlight if requested
             if (this.hintMove && r === this.hintMove.fromRow && c === this.hintMove.fromCol) {
-                cell.classList.add('cell-selected');
+                cell.classList.add('cell-hint-from');
+                const pieceInCell = cell.querySelector('.piece');
+                if (pieceInCell) {
+                    pieceInCell.classList.add('piece-hint');
+                }
             }
             if (this.hintMove && r === this.hintMove.toRow && c === this.hintMove.toCol) {
+                cell.classList.add('cell-hint-to');
                 const hintDot = document.createElement('div');
                 hintDot.className = 'valid-move-hint';
                 cell.appendChild(hintDot);
@@ -302,7 +309,19 @@ export class CheckersUI {
         this.elements.redPlayerCard.classList.toggle('active-turn', isRedTurn);
         this.elements.darkPlayerCard.classList.toggle('active-turn', !isRedTurn);
 
-        this.elements.turnText.textContent = isRedTurn ? "Red Player's Turn" : "Dark Player's Turn";
+        if (this.elements.redTurnBadge) {
+            this.elements.redTurnBadge.textContent = isRedTurn ? "YOUR TURN" : "WAITING";
+        }
+        if (this.elements.darkTurnBadge) {
+            const isAi = mode && mode.startsWith('ai');
+            this.elements.darkTurnBadge.textContent = !isRedTurn 
+                ? (isAi ? "THINKING..." : "DARK'S TURN") 
+                : "WAITING";
+        }
+
+        this.elements.turnText.textContent = isRedTurn 
+            ? "Red's Turn (Move Up ↑)" 
+            : (mode && mode.startsWith('ai') ? "Computer Thinking (Move Down ↓)" : "Dark's Turn (Move Down ↓)");
         const dot = this.elements.turnBanner.querySelector('.turn-dot');
         if (dot) {
             dot.className = `turn-dot ${isRedTurn ? 'red-dot' : 'dark-dot'}`;
@@ -317,6 +336,12 @@ export class CheckersUI {
 
         // Update Undo button state
         this.elements.undoBtn.disabled = this.game.history.length === 0 || this.game.gameOver;
+
+        // Update Hint button state
+        if (this.elements.hintBtn) {
+            const isAiTurn = mode && mode.startsWith('ai') && this.game.currentPlayer !== 'red';
+            this.elements.hintBtn.disabled = this.game.gameOver || isAiTurn;
+        }
     }
 
     renderCapturedPieces() {

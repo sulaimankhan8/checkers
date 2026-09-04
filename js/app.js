@@ -149,17 +149,19 @@ class App {
 
     handlePieceDrop(fromRow, fromCol, toRow, toCol) {
         if (this.game.gameOver || this.isAiProcessing || this.isAnimating) return;
+        this.ui.hintMove = null;
 
-        // Ensure from position is selected
-        this.game.selectedPiece = { row: fromRow, col: fromCol };
-        this.game.validMoves = this.game.getValidMovesForPiece(fromRow, fromCol);
+        // Select the starting square and then make move to target square
+        const selResult = this.game.selectSquare(fromRow, fromCol);
+        if (selResult.type === 'SELECTED') {
+            const actingPlayer = this.game.currentPlayer;
+            const result = this.game.selectSquare(toRow, toCol);
 
-        // Execute move immediately without extra slide since finger dragged piece
-        const actingPlayer = this.game.currentPlayer;
-        const result = this.game.selectSquare(toRow, toCol);
-
-        if (result.type === 'MOVE_COMPLETED' || result.type === 'MULTI_JUMP_CONTINUE') {
-            this.processMoveResult(result, actingPlayer);
+            if (result.type === 'MOVE_COMPLETED' || result.type === 'MULTI_JUMP_CONTINUE') {
+                this.processMoveResult(result, actingPlayer);
+            } else {
+                this.ui.render(this.mode);
+            }
         } else {
             this.ui.render(this.mode);
         }
@@ -336,6 +338,9 @@ class App {
     showHint() {
         if (this.game.gameOver || this.isAiProcessing || this.isAnimating) return;
         
+        // In AI mode, hint is strictly available for the human player (Red)
+        if (this.mode.startsWith('ai') && this.game.currentPlayer !== 'red') return;
+
         const bestMove = this.ai.getBestMove(this.game, this.game.currentPlayer);
         if (bestMove) {
             this.ui.hintMove = bestMove;

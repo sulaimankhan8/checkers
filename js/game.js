@@ -37,17 +37,19 @@ export class CheckersGame {
         this.board = Array(8).fill(null).map(() => Array(8).fill(PIECE_TYPES.EMPTY));
         
         // Place initial pieces on dark squares ((row + col) % 2 === 1)
+        // Rows 0 to 2: Dark / Computer pieces at top (aligned with Top Player Card)
         for (let r = 0; r < 3; r++) {
             for (let c = 0; c < 8; c++) {
                 if ((r + c) % 2 === 1) {
-                    this.board[r][c] = PIECE_TYPES.RED;
+                    this.board[r][c] = PIECE_TYPES.DARK;
                 }
             }
         }
+        // Rows 5 to 7: Red / Player pieces at bottom (aligned with Bottom Player Card)
         for (let r = 5; r < 8; r++) {
             for (let c = 0; c < 8; c++) {
                 if ((r + c) % 2 === 1) {
-                    this.board[r][c] = PIECE_TYPES.DARK;
+                    this.board[r][c] = PIECE_TYPES.RED;
                 }
             }
         }
@@ -117,14 +119,14 @@ export class CheckersGame {
         let moves = [];
         const isKing = this.isKing(piece);
         
-        // Directions: Red piece down (+1), Dark piece up (-1), King both (±1)
+        // Directions: Red piece moves UP (-1), Dark piece moves DOWN (+1), King both (±1)
         let directions = [];
         if (isKing) {
             directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
         } else if (player === 'red') {
-            directions = [[1, -1], [1, 1]];
-        } else {
             directions = [[-1, -1], [-1, 1]];
+        } else {
+            directions = [[1, -1], [1, 1]];
         }
 
         // Check single diagonal steps and jump steps
@@ -258,11 +260,11 @@ export class CheckersGame {
         // Check for King promotion
         let crowned = false;
         if (!this.isKing(pieceVal)) {
-            if (this.currentPlayer === 'red' && toRow === 7) {
+            if (this.currentPlayer === 'red' && toRow === 0) {
                 pieceVal = PIECE_TYPES.RED_KING;
                 crowned = true;
                 this.totalKingsCrowned++;
-            } else if (this.currentPlayer === 'dark' && toRow === 0) {
+            } else if (this.currentPlayer === 'dark' && toRow === 7) {
                 pieceVal = PIECE_TYPES.DARK_KING;
                 crowned = true;
                 this.totalKingsCrowned++;

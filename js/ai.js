@@ -15,7 +15,30 @@ export class CheckersAI {
 
     // Get best move for specified player ('dark' or 'red')
     getBestMove(game, player = 'dark') {
-        const moves = game.validMoves;
+        // Explicitly get legal moves for the target player
+        let moves;
+        if (game.inMultiJump && typeof game.getPieceMoves === 'function') {
+            const multiPiece = game.board[game.inMultiJump.row][game.inMultiJump.col];
+            if (this.isPiecePlayer(multiPiece, player)) {
+                moves = game.getPieceMoves(game.inMultiJump.row, game.inMultiJump.col, game.board, player).filter(m => m.isJump);
+            }
+        }
+        
+        if (!moves || moves.length === 0) {
+            if (typeof game.getAllLegalMoves === 'function') {
+                const legal = game.getAllLegalMoves(player, game.board);
+                moves = legal.moves;
+            } else {
+                moves = this.getSimulatedValidMoves(game.board, player, game.inMultiJump);
+            }
+        }
+
+        // Strict verification: all moves must originate from a piece owned by the specified player
+        moves = (moves || []).filter(m => {
+            const piece = game.board[m.fromRow][m.fromCol];
+            return this.isPiecePlayer(piece, player);
+        });
+
         if (!moves || moves.length === 0) return null;
 
         if (this.difficulty === 'easy') {
@@ -129,17 +152,17 @@ export class CheckersAI {
                 }
 
                 // Back-row defender bonus (prevents easy opponent kinging)
-                if (aiPlayer === 'dark' && piece === PIECE_TYPES.DARK && r === 7) {
+                if (aiPlayer === 'dark' && piece === PIECE_TYPES.DARK && r === 0) {
                     positionBonus += 2;
-                } else if (aiPlayer === 'red' && piece === PIECE_TYPES.RED && r === 0) {
+                } else if (aiPlayer === 'red' && piece === PIECE_TYPES.RED && r === 7) {
                     positionBonus += 2;
                 }
 
                 // Advancement incentive for regular pieces
                 if (piece === PIECE_TYPES.DARK) {
-                    positionBonus += (7 - r) * 0.3;
+                    positionBonus += r * 0.3; // Dark moves down (+r)
                 } else if (piece === PIECE_TYPES.RED) {
-                    positionBonus += r * 0.3;
+                    positionBonus += (7 - r) * 0.3; // Red moves up (7 - r)
                 }
 
                 score += mult * (pieceVal + positionBonus);
@@ -160,10 +183,10 @@ export class CheckersAI {
         simulatedBoard[fromRow][fromCol] = PIECE_TYPES.EMPTY;
         
         let crowned = false;
-        if (pieceVal === PIECE_TYPES.RED && toRow === 7) {
+        if (pieceVal === PIECE_TYPES.RED && toRow === 0) {
             pieceVal = PIECE_TYPES.RED_KING;
             crowned = true;
-        } else if (pieceVal === PIECE_TYPES.DARK && toRow === 0) {
+        } else if (pieceVal === PIECE_TYPES.DARK && toRow === 7) {
             pieceVal = PIECE_TYPES.DARK_KING;
             crowned = true;
         }
@@ -202,8 +225,8 @@ export class CheckersAI {
         const isKing = piece === PIECE_TYPES.RED_KING || piece === PIECE_TYPES.DARK_KING;
         let directions = [];
         if (isKing) directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
-        else if (player === 'red') directions = [[1, -1], [1, 1]];
-        else directions = [[-1, -1], [-1, 1]];
+        else if (player === 'red') directions = [[-1, -1], [-1, 1]];
+        else directions = [[1, -1], [1, 1]];
 
         let jumps = [];
         directions.forEach(([dr, dc]) => {
@@ -254,8 +277,8 @@ export class CheckersAI {
         const isKing = piece === PIECE_TYPES.RED_KING || piece === PIECE_TYPES.DARK_KING;
         let directions = [];
         if (isKing) directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
-        else if (player === 'red') directions = [[1, -1], [1, 1]];
-        else directions = [[-1, -1], [-1, 1]];
+        else if (player === 'red') directions = [[-1, -1], [-1, 1]];
+        else directions = [[1, -1], [1, 1]];
 
         let moves = [];
         directions.forEach(([dr, dc]) => {
