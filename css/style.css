@@ -1076,6 +1076,276 @@ body {
     justify-content: center;
 }
 
+/* ============================================
+   HOW TO PLAY / RULES MODAL STYLING
+   ============================================ */
+.rules-modal-box {
+    max-width: 460px;
+    max-height: 88vh;
+    padding: 18px 16px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+}
+
+.rules-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.rules-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rules-badge-icon {
+    margin: 0;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.rules-main-title {
+    font-size: 20px;
+    margin-bottom: 0;
+    line-height: 1.2;
+}
+
+.rules-sub-title {
+    font-size: 11px;
+    margin-bottom: 0;
+    color: var(--text-muted);
+}
+
+.rules-close-btn {
+    flex-shrink: 0;
+}
+
+/* Rules Tab Bar */
+.rules-tab-bar {
+    display: flex;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.35);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.rules-tab-btn {
+    flex: 1;
+    min-width: 72px;
+    padding: 8px 6px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.rules-tab-btn.active {
+    background: var(--primary-gradient);
+    color: #0e0a05;
+    box-shadow: 0 4px 12px rgba(230, 161, 0, 0.35);
+}
+
+/* Tab Panes & Content */
+.rules-tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 48vh;
+}
+
+.rules-pane {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    animation: fadeIn 0.25s ease-out;
+}
+
+.rules-pane.active {
+    display: flex;
+}
+
+/* Rule Card */
+.rule-card {
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rule-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rule-step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    color: #0e0a05;
+    font-size: 11px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.rule-card-header h3 {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.rule-card p {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.45;
+}
+
+.rule-card strong {
+    color: var(--text-main);
+}
+
+/* Visual Mini Diagram */
+.rule-visual-diagram {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mini-board-preview {
+    display: grid;
+    grid-template-columns: repeat(4, 38px);
+    grid-template-rows: repeat(2, 38px);
+    gap: 3px;
+}
+
+.mini-board-preview.king-grid {
+    grid-template-columns: repeat(3, 42px);
+    grid-template-rows: repeat(3, 42px);
+}
+
+.mini-cell {
+    background: var(--cell-dark);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.mini-cell:nth-child(even) {
+    background: var(--cell-light);
+    color: #333;
+}
+
+.mini-cell.mini-target {
+    background: rgba(230, 161, 0, 0.25);
+    border: 1.5px dashed var(--primary-color);
+    color: var(--primary-color);
+    animation: pulse 1.5s infinite alternate;
+}
+
+.mini-cell.mini-piece-red {
+    background: var(--piece-red-bg);
+    color: #fff;
+    border: 1.5px solid var(--piece-red-border);
+    box-shadow: 0 2px 8px rgba(198, 40, 40, 0.6);
+}
+
+.mini-cell.mini-piece-king {
+    background: var(--piece-red-bg);
+    color: #ffd700;
+    border: 2px solid #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+    font-size: 9px;
+    font-weight: 800;
+}
+
+/* Highlight Box */
+.rule-highlight-box {
+    background: rgba(230, 161, 0, 0.12);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+/* Checklist & Tips */
+.rule-checklist, .rule-tips-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 2px;
+}
+
+.rule-checklist li {
+    font-size: 12px;
+    color: var(--text-muted);
+    position: relative;
+    padding-left: 18px;
+    line-height: 1.4;
+}
+
+.rule-checklist li::before {
+    content: "✔";
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.rule-tips-list li {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    padding: 4px 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+}
+
+.rules-modal-footer {
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 /* CONFETTI CANVAS */
 #confettiCanvas {
     position: fixed;
@@ -1145,6 +1415,16 @@ body {
 
     .checkers-board {
         max-width: min(94vw, calc(100dvh - 205px));
+    }
+
+    .rules-modal-box {
+        padding: 14px 10px;
+    }
+
+    .rules-tab-btn {
+        min-width: 60px;
+        font-size: 11px;
+        padding: 6px 4px;
     }
 }
 
@@ -1408,6 +1688,17 @@ body {
         padding: 14px;
         max-height: 90vh;
         overflow-y: auto;
+    }
+
+    .rules-modal-box {
+        max-width: 520px;
+        max-height: 94vh;
+        padding: 10px 14px;
+        gap: 8px;
+    }
+
+    .rules-tab-content {
+        max-height: 42vh;
     }
 
     .modal-icon-badge {

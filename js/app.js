@@ -106,6 +106,19 @@ class App {
         if (homeSoundToggleBtn) homeSoundToggleBtn.addEventListener('click', toggleSoundAction);
         if (gameSoundToggleBtn) gameSoundToggleBtn.addEventListener('click', toggleSoundAction);
 
+        // How to Play / Rules Buttons (Home & In-Game Header)
+        const homeRulesBtn = document.getElementById('homeRulesBtn');
+        const gameRulesBtn = document.getElementById('gameRulesBtn');
+
+        const openRulesAction = () => {
+            this.ui.showHowToPlayModal('basics');
+            audio.playSelect();
+            audio.triggerHaptic(20);
+        };
+
+        if (homeRulesBtn) homeRulesBtn.addEventListener('click', openRulesAction);
+        if (gameRulesBtn) gameRulesBtn.addEventListener('click', openRulesAction);
+
         // Restart Game Button
         const restartBtn = document.getElementById('restartBtn');
         if (restartBtn) {

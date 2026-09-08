@@ -53,12 +53,14 @@ export class CheckersUI {
             darkPlayerName: document.getElementById('darkPlayerName'),
             redTurnBadge: document.getElementById('redTurnBadge'),
             darkTurnBadge: document.getElementById('darkTurnBadge'),
-            confettiCanvas: document.getElementById('confettiCanvas')
+            confettiCanvas: document.getElementById('confettiCanvas'),
+            howToPlayModal: document.getElementById('howToPlayModal')
         };
 
         this.initBoardDOM();
         this.bindGlobalTouchListeners();
         this.bindDrawerListeners();
+        this.bindRulesListeners();
     }
 
     showHomeScreen() {
@@ -479,4 +481,81 @@ export class CheckersUI {
         };
         anim();
     }
+
+    bindRulesListeners() {
+        // Tab switching
+        const tabBtns = document.querySelectorAll('.rules-tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabKey = btn.dataset.tab;
+                this.switchRulesTab(tabKey);
+                audio.playSelect();
+                audio.triggerHaptic(15);
+            });
+        });
+
+        // Close Buttons
+        const closeRulesBtn = document.getElementById('closeRulesBtn');
+        const rulesGotItBtn = document.getElementById('rulesGotItBtn');
+        
+        if (closeRulesBtn) {
+            closeRulesBtn.addEventListener('click', () => {
+                this.hideHowToPlayModal();
+                audio.playSelect();
+                audio.triggerHaptic(15);
+            });
+        }
+
+        if (rulesGotItBtn) {
+            rulesGotItBtn.addEventListener('click', () => {
+                this.hideHowToPlayModal();
+                audio.playSelect();
+                audio.triggerHaptic(20);
+            });
+        }
+
+        // Close on background backdrop click
+        if (this.elements.howToPlayModal) {
+            this.elements.howToPlayModal.addEventListener('click', (e) => {
+                if (e.target === this.elements.howToPlayModal) {
+                    this.hideHowToPlayModal();
+                }
+            });
+        }
+    }
+
+    showHowToPlayModal(defaultTab = 'basics') {
+        this.switchRulesTab(defaultTab);
+        if (this.elements.howToPlayModal) {
+            this.elements.howToPlayModal.classList.add('active');
+        }
+    }
+
+    hideHowToPlayModal() {
+        if (this.elements.howToPlayModal) {
+            this.elements.howToPlayModal.classList.remove('active');
+        }
+    }
+
+    switchRulesTab(tabKey) {
+        const tabBtns = document.querySelectorAll('.rules-tab-btn');
+        const panes = document.querySelectorAll('.rules-pane');
+        
+        tabBtns.forEach(btn => {
+            if (btn.dataset.tab === tabKey) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        panes.forEach(pane => {
+            if (pane.id === `pane-${tabKey}`) {
+                pane.classList.add('active');
+            } else {
+                pane.classList.remove('active');
+            }
+        });
+    }
 }
+

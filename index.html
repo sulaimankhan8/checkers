@@ -100,6 +100,13 @@
                 <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </symbol>
+            <!-- Book / Rules Icon -->
+            <symbol id="icon-book" viewBox="0 0 24 24">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="8" y1="7" x2="16" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="8" y1="11" x2="14" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
         </defs>
     </svg>
 
@@ -151,9 +158,13 @@
 
                 <!-- Sound & Quick Settings -->
                 <div class="menu-row">
-                    <button id="homeSoundToggleBtn" class="icon-btn-text" type="button">
+                    <button id="homeSoundToggleBtn" class="icon-btn-text" type="button" title="Toggle Sound FX">
                         <svg id="homeSoundIcon" class="svg-icon"><use href="#icon-volume-on"></use></svg>
                         <span>Sound FX</span>
+                    </button>
+                    <button id="homeRulesBtn" class="icon-btn-text" type="button" title="How to Play / Rules">
+                        <svg class="svg-icon"><use href="#icon-book"></use></svg>
+                        <span>How to Play</span>
                     </button>
                 </div>
 
@@ -181,6 +192,9 @@
                 </div>
 
                 <div class="header-right-actions">
+                    <button id="gameRulesBtn" class="icon-btn" title="How to Play / Rules">
+                        <svg class="svg-icon"><use href="#icon-book"></use></svg>
+                    </button>
                     <button id="gameSoundToggleBtn" class="icon-btn" title="Toggle Sound">
                         <svg id="gameSoundIcon" class="svg-icon"><use href="#icon-volume-on"></use></svg>
                     </button>
@@ -281,6 +295,163 @@
         </div>
         <div class="move-log-list" id="moveLogList">
             <div class="move-log-empty">Game started. Red to move.</div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         HOW TO PLAY / RULES MODAL
+         ============================================ -->
+    <div id="howToPlayModal" class="modal-overlay rules-modal-overlay">
+        <div class="modal-box rules-modal-box">
+            <div class="rules-modal-header">
+                <div class="rules-title-group">
+                    <div class="modal-icon-badge rules-badge-icon">
+                        <svg class="svg-icon modal-main-icon"><use href="#icon-book"></use></svg>
+                    </div>
+                    <div>
+                        <h2 class="modal-title rules-main-title">How to Play</h2>
+                        <p class="modal-subtitle rules-sub-title">Master the board with classic Checkers rules</p>
+                    </div>
+                </div>
+                <button id="closeRulesBtn" class="icon-btn rules-close-btn" type="button" title="Close Rules">
+                    <svg class="svg-icon"><use href="#icon-close"></use></svg>
+                </button>
+            </div>
+
+            <!-- Rules Navigation Tabs -->
+            <div class="rules-tab-bar" role="tablist">
+                <button type="button" class="rules-tab-btn active" data-tab="basics" role="tab">
+                    <span>Movement</span>
+                </button>
+                <button type="button" class="rules-tab-btn" data-tab="captures" role="tab">
+                    <span>Captures</span>
+                </button>
+                <button type="button" class="rules-tab-btn" data-tab="kings" role="tab">
+                    <span>Kings 👑</span>
+                </button>
+                <button type="button" class="rules-tab-btn" data-tab="winning" role="tab">
+                    <span>Strategy</span>
+                </button>
+            </div>
+
+            <!-- Rules Content Tabs -->
+            <div class="rules-tab-content">
+                <!-- TAB 1: BASICS / MOVEMENT -->
+                <div class="rules-pane active" id="pane-basics">
+                    <div class="rule-card">
+                        <div class="rule-card-header">
+                            <span class="rule-step-badge">1</span>
+                            <h3>Dark Squares & Diagonals</h3>
+                        </div>
+                        <p>Checkers is played exclusively on the <strong>32 dark squares</strong> of an 8×8 board. Red plays first.</p>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-card-header">
+                            <span class="rule-step-badge">2</span>
+                            <h3>Forward Movement Only</h3>
+                        </div>
+                        <p>Standard pieces move diagonally <strong>1 step forward</strong> to an unoccupied adjacent dark square.</p>
+                        <div class="rule-visual-diagram">
+                            <div class="mini-board-preview">
+                                <div class="mini-cell"></div>
+                                <div class="mini-cell mini-target">↖ Next</div>
+                                <div class="mini-cell"></div>
+                                <div class="mini-cell mini-target">↗ Next</div>
+                                <div class="mini-cell"></div>
+                                <div class="mini-cell mini-piece-red">● You</div>
+                                <div class="mini-cell"></div>
+                                <div class="mini-cell"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: CAPTURES & MULTI-JUMPS -->
+                <div class="rules-pane" id="pane-captures">
+                    <div class="rule-card">
+                        <div class="rule-card-header">
+                            <span class="rule-step-badge">⚔️</span>
+                            <h3>Jumping & Removing Pieces</h3>
+                        </div>
+                        <p>If an opponent piece is diagonally in front of you and the square directly behind it is empty, you <strong>jump over it</strong> to capture and remove it.</p>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-card-header">
+                            <span class="rule-step-badge">⚡</span>
+                            <h3>Multi-Jump Chains</h3>
+                        </div>
+                        <p>If your piece lands on a square that allows another legal jump, you <strong>keep jumping in the same turn</strong> to capture multiple pieces!</p>
+                        <div class="rule-highlight-box">
+                            <strong>💡 Pro Rule:</strong> Captures clear the board fast! Watch for cascading double or triple jumps.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: KINGS & CROWNING -->
+                <div class="rules-pane" id="pane-kings">
+                    <div class="rule-card">
+                        <div class="rule-card-header">
+                            <span class="rule-step-badge">👑</span>
+                            <h3>Crown Promotion</h3>
+                        </div>
+                        <p>When your piece reaches the opponent's <strong>furthest back row</strong>, it is crowned a <strong>King</strong>!</p>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-card-header">
+                            <span class="rule-step-badge">✨</span>
+                            <h3>Full 360° Diagonal Power</h3>
+                        </div>
+                        <p>Kings can move and jump both <strong>forwards AND backwards</strong> diagonally, giving you immense tactical control over the board.</p>
+                        <div class="rule-visual-diagram king-diagram">
+                            <div class="mini-board-preview king-grid">
+                                <div class="mini-cell mini-target">↖</div>
+                                <div class="mini-cell"></div>
+                                <div class="mini-cell mini-target">↗</div>
+                                <div class="mini-cell"></div>
+                                <div class="mini-cell mini-piece-king">👑 King</div>
+                                <div class="mini-cell"></div>
+                                <div class="mini-cell mini-target">↙</div>
+                                <div class="mini-cell"></div>
+                                <div class="mini-cell mini-target">↘</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: WINNING & PRO TIPS -->
+                <div class="rules-pane" id="pane-winning">
+                    <div class="rule-card">
+                        <div class="rule-card-header">
+                            <span class="rule-step-badge">🏆</span>
+                            <h3>How to Win</h3>
+                        </div>
+                        <p>You achieve victory when:</p>
+                        <ul class="rule-checklist">
+                            <li>You capture <strong>all 12</strong> of your opponent's pieces.</li>
+                            <li>You trap your opponent so they have <strong>no legal moves</strong> remaining.</li>
+                        </ul>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-card-header">
+                            <span class="rule-step-badge">🧠</span>
+                            <h3>Grandmaster Strategies</h3>
+                        </div>
+                        <ul class="rule-tips-list">
+                            <li><strong>Protect your back row:</strong> Don't move your last row pieces too early so the enemy cannot easily make Kings.</li>
+                            <li><strong>Control the center:</strong> Pieces in the center have 2 diagonal paths, while edge pieces only have 1.</li>
+                            <li><strong>Set up multi-jumps:</strong> Bait your opponent by sacrificing 1 piece to capture 2 or 3 of theirs in return!</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Bottom Button -->
+            <div class="rules-modal-footer">
+                <button id="rulesGotItBtn" class="btn btn-primary btn-lg" type="button">
+                    <svg class="svg-icon"><use href="#icon-play"></use></svg>
+                    <span>Got It, Let's Play!</span>
+                </button>
+            </div>
         </div>
     </div>
 
