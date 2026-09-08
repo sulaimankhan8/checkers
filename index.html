@@ -350,7 +350,7 @@
                             <span class="rule-step-badge">2</span>
                             <h3>Forward Movement Only</h3>
                         </div>
-                        <p>Standard pieces move diagonally <strong>1 step forward</strong> to an unoccupied adjacent dark square.</p>
+                        <p>Standard pieces move diagonally <strong>1 step forward</strong> to an unoccupied adjacent dark square (when no jumps are available).</p>
                         <div class="rule-visual-diagram">
                             <div class="mini-board-preview">
                                 <div class="mini-cell"></div>
@@ -375,15 +375,22 @@
                         </div>
                         <p>If an opponent piece is diagonally in front of you and the square directly behind it is empty, you <strong>jump over it</strong> to capture and remove it.</p>
                     </div>
+                    <div class="rule-card rule-card-alert">
+                        <div class="rule-card-header">
+                            <span class="rule-step-badge badge-alert">⚠️</span>
+                            <h3>Mandatory Capture (Forced Jump)</h3>
+                        </div>
+                        <p>In official Checkers rules, <strong>captures are mandatory</strong>. If a jump is available anywhere on the board for your pieces, you <strong>MUST make a jump</strong>. Regular 1-step moves are disabled until all available captures are completed.</p>
+                        <div class="rule-highlight-box alert-box">
+                            <strong>🔒 Forced Jump Rule:</strong> If you or your opponent can capture a piece, no other non-jumping piece can be moved instead. If multiple pieces can jump, you can choose which jump to make!
+                        </div>
+                    </div>
                     <div class="rule-card">
                         <div class="rule-card-header">
                             <span class="rule-step-badge">⚡</span>
                             <h3>Multi-Jump Chains</h3>
                         </div>
                         <p>If your piece lands on a square that allows another legal jump, you <strong>keep jumping in the same turn</strong> to capture multiple pieces!</p>
-                        <div class="rule-highlight-box">
-                            <strong>💡 Pro Rule:</strong> Captures clear the board fast! Watch for cascading double or triple jumps.
-                        </div>
                     </div>
                 </div>
 

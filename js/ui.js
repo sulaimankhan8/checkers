@@ -321,9 +321,16 @@ export class CheckersUI {
                 : "WAITING";
         }
 
-        this.elements.turnText.textContent = isRedTurn 
-            ? "Red's Turn (Move Up ↑)" 
-            : (mode && mode.startsWith('ai') ? "Computer Thinking (Move Down ↓)" : "Dark's Turn (Move Down ↓)");
+        const mustJump = this.game.mustJump;
+        if (mustJump) {
+            this.elements.turnText.textContent = isRedTurn
+                ? "Red's Turn — Jump Required! ⚔️"
+                : (mode && mode.startsWith('ai') ? "Computer Jumping... ⚔️" : "Dark's Turn — Jump Required! ⚔️");
+        } else {
+            this.elements.turnText.textContent = isRedTurn 
+                ? "Red's Turn (Move Up ↑)" 
+                : (mode && mode.startsWith('ai') ? "Computer Thinking (Move Down ↓)" : "Dark's Turn (Move Down ↓)");
+        }
         const dot = this.elements.turnBanner.querySelector('.turn-dot');
         if (dot) {
             dot.className = `turn-dot ${isRedTurn ? 'red-dot' : 'dark-dot'}`;

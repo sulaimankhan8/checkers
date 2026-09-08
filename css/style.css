@@ -1306,6 +1306,21 @@ body {
     line-height: 1.4;
 }
 
+.rule-card-alert {
+    border-color: rgba(255, 170, 0, 0.4);
+    background: rgba(255, 170, 0, 0.08);
+}
+
+.badge-alert {
+    background: linear-gradient(135deg, #ffaa00, #ff5500);
+    color: #fff;
+}
+
+.alert-box {
+    background: rgba(255, 85, 0, 0.15);
+    border-left-color: #ffaa00;
+}
+
 /* Checklist & Tips */
 .rule-checklist, .rule-tips-list {
     list-style: none;
