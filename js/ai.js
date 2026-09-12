@@ -29,7 +29,7 @@ export class CheckersAI {
                 const legal = game.getAllLegalMoves(player, game.board);
                 moves = legal.moves;
             } else {
-                moves = this.getSimulatedValidMoves(game.board, player, game.inMultiJump);
+                moves = this.getSimulatedValidMoves(game.board, player, game.inMultiJump, game.mandatoryJump !== false);
             }
         }
 
@@ -210,11 +210,13 @@ export class CheckersAI {
         }
 
         // Return light simulated game object
+        const mandatoryJump = game.mandatoryJump !== false;
         return {
             board: simulatedBoard,
             currentPlayer: nextPlayer,
             inMultiJump,
-            validMoves: this.getSimulatedValidMoves(simulatedBoard, nextPlayer, inMultiJump),
+            mandatoryJump,
+            validMoves: this.getSimulatedValidMoves(simulatedBoard, nextPlayer, inMultiJump, mandatoryJump),
             gameOver: false,
             winner: null
         };
@@ -252,7 +254,7 @@ export class CheckersAI {
         return jumps;
     }
 
-    getSimulatedValidMoves(board, player, inMultiJump) {
+    getSimulatedValidMoves(board, player, inMultiJump, mandatoryJump = true) {
         if (inMultiJump) {
             return this.getSimulatedJumps(board, inMultiJump.row, inMultiJump.col, player);
         }
@@ -269,7 +271,10 @@ export class CheckersAI {
                 }
             }
         }
-        return jumps.length > 0 ? jumps : moves;
+        if (mandatoryJump && jumps.length > 0) {
+            return jumps;
+        }
+        return [...moves, ...jumps];
     }
 
     getSimulatedMovesForPiece(board, row, col, player) {

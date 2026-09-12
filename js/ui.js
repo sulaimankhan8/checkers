@@ -40,6 +40,10 @@ export class CheckersUI {
             closeLogBtn: document.getElementById('closeLogBtn'),
             undoBtn: document.getElementById('undoBtn'),
             hintBtn: document.getElementById('hintBtn'),
+            endTurnBtn: document.getElementById('endTurnBtn'),
+            mandatoryJumpToggle: document.getElementById('mandatoryJumpToggle'),
+            mandatoryJumpBadge: document.getElementById('mandatoryJumpBadge'),
+            mandatoryJumpDesc: document.getElementById('mandatoryJumpDesc'),
             headerModeLabel: document.getElementById('headerModeLabel'),
             winModal: document.getElementById('winModal'),
             modalBox: document.getElementById('modalBox'),
@@ -321,15 +325,42 @@ export class CheckersUI {
                 : "WAITING";
         }
 
+        // Update End Turn button visibility during optional multi-jump
+        if (this.elements.endTurnBtn) {
+            const isHumanTurn = !mode.startsWith('ai') || this.game.currentPlayer === 'red';
+            if (this.game.inMultiJump && !this.game.mandatoryJump && isHumanTurn && !this.game.gameOver) {
+                this.elements.endTurnBtn.style.display = 'inline-flex';
+            } else {
+                this.elements.endTurnBtn.style.display = 'none';
+            }
+        }
+
         const mustJump = this.game.mustJump;
-        if (mustJump) {
+        if (this.game.inMultiJump) {
+            if (this.game.mandatoryJump) {
+                this.elements.turnText.textContent = isRedTurn
+                    ? "Red's Turn — Multi-Jump Required! ⚔️"
+                    : (mode && mode.startsWith('ai') ? "Computer Jumping... ⚔️" : "Dark's Turn — Multi-Jump Required! ⚔️");
+            } else {
+                this.elements.turnText.textContent = isRedTurn
+                    ? "Red's Turn — Jump or End Turn ✨"
+                    : (mode && mode.startsWith('ai') ? "Computer Multi-Jump... ✨" : "Dark's Turn — Jump or End Turn ✨");
+            }
+        } else if (mustJump) {
             this.elements.turnText.textContent = isRedTurn
                 ? "Red's Turn — Jump Required! ⚔️"
                 : (mode && mode.startsWith('ai') ? "Computer Jumping... ⚔️" : "Dark's Turn — Jump Required! ⚔️");
         } else {
-            this.elements.turnText.textContent = isRedTurn 
-                ? "Red's Turn (Move Up ↑)" 
-                : (mode && mode.startsWith('ai') ? "Computer Thinking (Move Down ↓)" : "Dark's Turn (Move Down ↓)");
+            const hasJumpAvailable = this.game.validMoves.some(m => m.isJump);
+            if (hasJumpAvailable && !this.game.mandatoryJump) {
+                this.elements.turnText.textContent = isRedTurn 
+                    ? "Red's Turn (Jump Available ⚔️)" 
+                    : (mode && mode.startsWith('ai') ? "Computer Thinking... (Move Down ↓)" : "Dark's Turn (Jump Available ⚔️)");
+            } else {
+                this.elements.turnText.textContent = isRedTurn 
+                    ? "Red's Turn (Move Up ↑)" 
+                    : (mode && mode.startsWith('ai') ? "Computer Thinking (Move Down ↓)" : "Dark's Turn (Move Down ↓)");
+            }
         }
         const dot = this.elements.turnBanner.querySelector('.turn-dot');
         if (dot) {

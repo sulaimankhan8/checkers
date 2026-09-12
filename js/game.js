@@ -18,6 +18,7 @@ export class CheckersGame {
         this.validMoves = []; // Array of { fromRow, fromCol, toRow, toCol, isJump, captured }
         this.mustJump = false;
         this.inMultiJump = null; // { row, col } if locked in multi-jump
+        this.mandatoryJump = true; // true: jumps & multi-jumps compulsory, false: optional
         
         this.history = [];
         this.capturedRed = 0;
@@ -69,6 +70,11 @@ export class CheckersGame {
         this.updateValidMoves();
     }
 
+    setMandatoryJump(mandatory) {
+        this.mandatoryJump = !!mandatory;
+        this.updateValidMoves();
+    }
+
     // Helper check piece ownership
     isPlayerPiece(val, player) {
         if (player === 'red') return val === PIECE_TYPES.RED || val === PIECE_TYPES.RED_KING;
@@ -104,11 +110,12 @@ export class CheckersGame {
             }
         }
 
-        // Forced Jump Rule: if any jump exists, ONLY jumps are allowed!
-        if (jumps.length > 0) {
+        // Forced Jump Rule: if mandatoryJump is enabled and any jump exists, ONLY jumps are allowed!
+        if (this.mandatoryJump && jumps.length > 0) {
             return { moves: jumps, mustJump: true };
         }
-        return { moves: moves, mustJump: false };
+        // When not compulsory: both normal 1-step moves AND jumps are allowed
+        return { moves: [...moves, ...jumps], mustJump: false };
     }
 
     // Get moves for a specific piece
@@ -175,11 +182,11 @@ export class CheckersGame {
 
     updateValidMoves() {
         if (this.inMultiJump) {
-            // Locked in multi-jump sequence for the specific piece
+            // Locked or active in multi-jump sequence for the specific piece
             const pieceMoves = this.getPieceMoves(this.inMultiJump.row, this.inMultiJump.col);
             const jumps = pieceMoves.filter(m => m.isJump);
             this.validMoves = jumps;
-            this.mustJump = true;
+            this.mustJump = this.mandatoryJump;
             return;
         }
 
@@ -199,12 +206,8 @@ export class CheckersGame {
 
         const piece = this.board[row][col];
 
-        // If in multi-jump, user can only interact with the multi-jump piece
+        // If in multi-jump, user can interact with the multi-jump piece or its targets
         if (this.inMultiJump) {
-            if (row === this.inMultiJump.row && col === this.inMultiJump.col) {
-                this.selectedPiece = { row, col };
-                return { type: 'SELECTED', row, col };
-            }
             // Check if user clicked a valid multi-jump destination
             const move = this.validMoves.find(m => 
                 m.fromRow === this.inMultiJump.row && 
@@ -215,18 +218,29 @@ export class CheckersGame {
             if (move) {
                 return this.makeMove(move);
             }
+
+            // If user clicked the piece currently jumping
+            if (row === this.inMultiJump.row && col === this.inMultiJump.col) {
+                // If jumps are optional, clicking the piece ends the multi-jump turn
+                if (!this.mandatoryJump) {
+                    return this.endMultiJump();
+                }
+                this.selectedPiece = { row, col };
+                return { type: 'SELECTED', row, col };
+            }
+
             return { type: 'INVALID' };
         }
 
         // Standard piece selection
         if (this.isPlayerPiece(piece, this.currentPlayer)) {
-            // If mustJump is active, ensure this piece has a jump move available!
+            // Check if this piece has any valid moves
             const pieceHasValidMove = this.validMoves.some(m => m.fromRow === row && m.fromCol === col);
             if (pieceHasValidMove) {
                 this.selectedPiece = { row, col };
                 return { type: 'SELECTED', row, col };
             } else {
-                return { type: 'MUST_JUMP_OTHER_PIECE' };
+                return { type: this.mustJump ? 'MUST_JUMP_OTHER_PIECE' : 'INVALID' };
             }
         }
 
@@ -245,6 +259,21 @@ export class CheckersGame {
 
         this.selectedPiece = null;
         return { type: 'DESELECTED' };
+    }
+
+    // Explicitly end multi-jump when jumping is optional
+    endMultiJump() {
+        if (!this.inMultiJump) return { type: 'INVALID' };
+        this.inMultiJump = null;
+        this.selectedPiece = null;
+        this.currentPlayer = this.currentPlayer === 'red' ? 'dark' : 'red';
+        this.updateValidMoves();
+        this.checkWinCondition();
+        return {
+            type: 'TURN_ENDED',
+            gameOver: this.gameOver,
+            winner: this.winner
+        };
     }
 
     makeMove(move) {
@@ -293,7 +322,8 @@ export class CheckersGame {
                     type: 'MULTI_JUMP_CONTINUE',
                     move,
                     crowned,
-                    inMultiJump: true
+                    inMultiJump: true,
+                    canEndTurn: !this.mandatoryJump
                 };
             }
         }

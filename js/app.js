@@ -13,6 +13,7 @@ class App {
         this.ui = new CheckersUI(this.game);
         this.ai = new CheckersAI('easy');
         this.mode = 'ai-easy'; // 'pvp', 'ai-easy', 'ai-hard'
+        this.mandatoryJump = true; // true: forced jumps/multi-jumps, false: optional
         this.isAiProcessing = false;
         this.isAnimating = false;
         
@@ -85,14 +86,24 @@ class App {
             });
         }
 
-        // Sound Toggle Buttons (Home & Game Header)
+        // Sound & Music Toggle Buttons (Home & Game Header)
         const homeSoundToggleBtn = document.getElementById('homeSoundToggleBtn');
         const gameSoundToggleBtn = document.getElementById('gameSoundToggleBtn');
+        const homeMusicToggleBtn = document.getElementById('homeMusicToggleBtn');
+        const gameMusicToggleBtn = document.getElementById('gameMusicToggleBtn');
         
         const updateSoundIcons = (enabled) => {
             const iconHref = enabled ? '#icon-volume-on' : '#icon-volume-off';
             const homeIcon = document.querySelector('#homeSoundIcon use');
             const gameIcon = document.querySelector('#gameSoundIcon use');
+            if (homeIcon) homeIcon.setAttribute('href', iconHref);
+            if (gameIcon) gameIcon.setAttribute('href', iconHref);
+        };
+
+        const updateMusicIcons = (enabled) => {
+            const iconHref = enabled ? '#icon-music' : '#icon-music-off';
+            const homeIcon = document.querySelector('#homeMusicIcon use');
+            const gameIcon = document.querySelector('#gameMusicIcon use');
             if (homeIcon) homeIcon.setAttribute('href', iconHref);
             if (gameIcon) gameIcon.setAttribute('href', iconHref);
         };
@@ -103,8 +114,16 @@ class App {
             audio.triggerHaptic(15);
         };
 
+        const toggleMusicAction = () => {
+            const enabled = audio.toggleMusic();
+            updateMusicIcons(enabled);
+            audio.triggerHaptic(15);
+        };
+
         if (homeSoundToggleBtn) homeSoundToggleBtn.addEventListener('click', toggleSoundAction);
         if (gameSoundToggleBtn) gameSoundToggleBtn.addEventListener('click', toggleSoundAction);
+        if (homeMusicToggleBtn) homeMusicToggleBtn.addEventListener('click', toggleMusicAction);
+        if (gameMusicToggleBtn) gameMusicToggleBtn.addEventListener('click', toggleMusicAction);
 
         // How to Play / Rules Buttons (Home & In-Game Header)
         const homeRulesBtn = document.getElementById('homeRulesBtn');
@@ -157,6 +176,47 @@ class App {
         const hintBtn = document.getElementById('hintBtn');
         if (hintBtn) {
             hintBtn.addEventListener('click', () => this.showHint());
+        }
+
+        // Mandatory Jumps / Forced Captures Toggle
+        const mandatoryJumpToggle = document.getElementById('mandatoryJumpToggle');
+        const mandatoryJumpBadge = document.getElementById('mandatoryJumpBadge');
+        const mandatoryJumpDesc = document.getElementById('mandatoryJumpDesc');
+
+        if (mandatoryJumpToggle) {
+            mandatoryJumpToggle.addEventListener('change', (e) => {
+                this.mandatoryJump = e.target.checked;
+                this.game.setMandatoryJump(this.mandatoryJump);
+                if (mandatoryJumpBadge) {
+                    mandatoryJumpBadge.textContent = this.mandatoryJump ? 'Forced' : 'Optional';
+                    mandatoryJumpBadge.className = `rule-toggle-badge ${this.mandatoryJump ? '' : 'badge-optional'}`;
+                }
+                if (mandatoryJumpDesc) {
+                    mandatoryJumpDesc.textContent = this.mandatoryJump 
+                        ? 'Jumps & multi-jumps are compulsory (Official Rules)' 
+                        : 'Captures & multi-jumps are optional (Free Play)';
+                }
+                audio.playSelect();
+                audio.triggerHaptic(15);
+            });
+        }
+
+        // End Turn Button (for optional multi-jump)
+        const endTurnBtn = document.getElementById('endTurnBtn');
+        if (endTurnBtn) {
+            endTurnBtn.addEventListener('click', () => {
+                if (this.game.inMultiJump && !this.game.mandatoryJump) {
+                    const result = this.game.endMultiJump();
+                    if (result.type === 'TURN_ENDED') {
+                        audio.playMove();
+                        audio.triggerHaptic(15);
+                        this.ui.render(this.mode);
+                        if (this.mode.startsWith('ai') && this.game.currentPlayer === 'dark') {
+                            this.triggerAiTurn();
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -242,6 +302,13 @@ class App {
         this.ui.render(this.mode);
 
         if (result.gameOver) {
+            if (this.mode.startsWith('ai')) {
+                if (result.winner === 'red') audio.playVictory();
+                else audio.playDefeat();
+            } else {
+                audio.playVictory();
+            }
+
             this.ui.showWinModal(
                 result.winner,
                 this.mode,
@@ -317,6 +384,9 @@ class App {
                     } else {
                         this.isAiProcessing = false;
                         if (result.gameOver) {
+                            if (result.winner === 'red') audio.playVictory();
+                            else audio.playDefeat();
+
                             this.ui.showWinModal(
                                 result.winner,
                                 this.mode,
@@ -344,7 +414,7 @@ class App {
         this.ui.lastMove = null;
         this.ui.hintMove = null;
         this.ui.render(this.mode);
-        audio.playSelect();
+        audio.playUndo();
         audio.triggerHaptic(15);
     }
 
@@ -367,6 +437,7 @@ class App {
         this.isAiProcessing = false;
         this.isAnimating = false;
         this.game.reset();
+        this.game.setMandatoryJump(this.mandatoryJump);
         this.ui.lastMove = null;
         this.ui.hintMove = null;
         this.ui.clearMoveLog();
