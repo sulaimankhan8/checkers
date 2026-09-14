@@ -224,8 +224,16 @@ class App {
         if (this.game.gameOver || this.isAiProcessing || this.isAnimating) return;
         this.ui.hintMove = null;
 
-        // Select the starting square and then make move to target square
-        const selResult = this.game.selectSquare(fromRow, fromCol);
+        if (fromRow === toRow && fromCol === toCol) {
+            this.handleSquareClick(fromRow, fromCol);
+            return;
+        }
+
+        let selResult = { type: 'SELECTED' };
+        if (!this.game.selectedPiece || this.game.selectedPiece.row !== fromRow || this.game.selectedPiece.col !== fromCol) {
+            selResult = this.game.selectSquare(fromRow, fromCol);
+        }
+
         if (selResult.type === 'SELECTED') {
             const actingPlayer = this.game.currentPlayer;
             const result = this.game.selectSquare(toRow, toCol);

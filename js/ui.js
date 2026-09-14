@@ -14,13 +14,19 @@ export class CheckersUI {
         this.onPieceDrop = null;
         
         // Touch Dragging State
-        this.dragState = {
-            isDragging: false,
+        this.touchState = {
+            startX: 0,
+            startY: 0,
             fromRow: null,
             fromCol: null,
+            isDragging: false,
             dragElement: null,
-            hoverCell: null
+            hoverCell: null,
+            targetPiece: null,
+            isKing: false,
+            isRed: false
         };
+        this.lastTouchEndTime = 0;
 
         this.elements = {
             homeScreen: document.getElementById('homeScreen'),
@@ -68,12 +74,14 @@ export class CheckersUI {
     }
 
     showHomeScreen() {
+        this.cleanupDrag();
         document.body.className = `theme-${document.querySelector('.theme-pill.active')?.dataset.theme || 'wood'} screen-home`;
         this.elements.homeScreen.classList.add('active');
         this.elements.gameScreen.classList.remove('active');
     }
 
     showGameScreen() {
+        this.cleanupDrag();
         document.body.className = `theme-${document.querySelector('.theme-pill.active')?.dataset.theme || 'wood'} screen-game`;
         this.elements.homeScreen.classList.remove('active');
         this.elements.gameScreen.classList.add('active');
@@ -89,8 +97,9 @@ export class CheckersUI {
                 cell.dataset.row = r;
                 cell.dataset.col = c;
 
-                // Click listener
+                // Click listener (debounced against touch)
                 cell.addEventListener('click', () => {
+                    if (Date.now() - this.lastTouchEndTime < 400) return;
                     if (this.onSquareClick) {
                         this.onSquareClick(r, c);
                     }
@@ -103,57 +112,115 @@ export class CheckersUI {
 
     bindGlobalTouchListeners() {
         document.addEventListener('touchmove', (e) => {
-            if (!this.dragState.isDragging || !this.dragState.dragElement) return;
-            e.preventDefault();
-
+            if (this.touchState.fromRow === null) return;
             const touch = e.touches[0];
-            this.dragState.dragElement.style.left = `${touch.clientX}px`;
-            this.dragState.dragElement.style.top = `${touch.clientY}px`;
+            if (!touch) return;
 
-            const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
-            const cell = targetEl ? targetEl.closest('.board-cell') : null;
+            const dist = Math.hypot(touch.clientX - this.touchState.startX, touch.clientY - this.touchState.startY);
 
-            if (this.dragState.hoverCell && this.dragState.hoverCell !== cell) {
-                this.dragState.hoverCell.classList.remove('cell-drag-over');
-            }
+            // Activate dragging only after movement exceeds threshold
+            if (!this.touchState.isDragging && dist > 8) {
+                this.touchState.isDragging = true;
 
-            if (cell && cell.classList.contains('cell-dark')) {
-                cell.classList.add('cell-drag-over');
-                this.dragState.hoverCell = cell;
-            } else {
-                this.dragState.hoverCell = null;
-            }
-        }, { passive: false });
+                // Remove any stale dragging avatars first
+                document.querySelectorAll('.dragging-piece').forEach(el => el.remove());
 
-        document.addEventListener('touchend', (e) => {
-            if (!this.dragState.isDragging) return;
+                const dragAv = document.createElement('div');
+                dragAv.className = `piece ${this.touchState.isRed ? 'red-piece' : 'dark-piece'} dragging-piece`;
+                if (this.touchState.isKing) {
+                    dragAv.classList.add('piece-king');
+                    dragAv.innerHTML = `<svg class="svg-icon piece-crown-icon"><use href="#icon-crown"></use></svg>`;
+                }
+                dragAv.style.left = `${touch.clientX}px`;
+                dragAv.style.top = `${touch.clientY}px`;
+                document.body.appendChild(dragAv);
+                this.touchState.dragElement = dragAv;
 
-            if (this.dragState.hoverCell) {
-                this.dragState.hoverCell.classList.remove('cell-drag-over');
-                const toRow = parseInt(this.dragState.hoverCell.dataset.row);
-                const toCol = parseInt(this.dragState.hoverCell.dataset.col);
-
-                if (this.onPieceDrop) {
-                    this.onPieceDrop(this.dragState.fromRow, this.dragState.fromCol, toRow, toCol);
+                if (this.touchState.targetPiece) {
+                    this.touchState.targetPiece.style.opacity = '0.35';
                 }
             }
 
+            if (this.touchState.isDragging) {
+                if (e.cancelable) e.preventDefault();
+                
+                if (this.touchState.dragElement) {
+                    this.touchState.dragElement.style.left = `${touch.clientX}px`;
+                    this.touchState.dragElement.style.top = `${touch.clientY}px`;
+                }
+
+                const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+                const cell = targetEl ? targetEl.closest('.board-cell') : null;
+
+                if (this.touchState.hoverCell && this.touchState.hoverCell !== cell) {
+                    this.touchState.hoverCell.classList.remove('cell-drag-over');
+                }
+
+                if (cell && cell.classList.contains('cell-dark')) {
+                    cell.classList.add('cell-drag-over');
+                    this.touchState.hoverCell = cell;
+                } else {
+                    this.touchState.hoverCell = null;
+                }
+            }
+        }, { passive: false });
+
+        const endTouchHandler = () => {
+            if (this.touchState.fromRow === null) return;
+            this.lastTouchEndTime = Date.now();
+
+            const fromRow = this.touchState.fromRow;
+            const fromCol = this.touchState.fromCol;
+            const wasDragging = this.touchState.isDragging;
+            const hoverCell = this.touchState.hoverCell;
+
             this.cleanupDrag();
-        });
+
+            if (wasDragging) {
+                if (hoverCell && hoverCell.dataset.row !== undefined && hoverCell.dataset.col !== undefined) {
+                    const toRow = parseInt(hoverCell.dataset.row);
+                    const toCol = parseInt(hoverCell.dataset.col);
+                    if (this.onPieceDrop) {
+                        this.onPieceDrop(fromRow, fromCol, toRow, toCol);
+                    }
+                }
+            } else {
+                // Tap detected
+                if (this.onSquareClick) {
+                    this.onSquareClick(fromRow, fromCol);
+                }
+            }
+        };
+
+        document.addEventListener('touchend', endTouchHandler, { passive: true });
+        document.addEventListener('touchcancel', () => {
+            this.lastTouchEndTime = Date.now();
+            this.cleanupDrag();
+        }, { passive: true });
     }
 
     cleanupDrag() {
-        if (this.dragState.dragElement) {
-            this.dragState.dragElement.remove();
-            this.dragState.dragElement = null;
+        if (this.touchState.dragElement) {
+            this.touchState.dragElement.remove();
+            this.touchState.dragElement = null;
         }
-        if (this.dragState.hoverCell) {
-            this.dragState.hoverCell.classList.remove('cell-drag-over');
-            this.dragState.hoverCell = null;
+        if (this.touchState.targetPiece) {
+            this.touchState.targetPiece.style.opacity = '1';
+            this.touchState.targetPiece = null;
         }
-        this.dragState.isDragging = false;
-        this.dragState.fromRow = null;
-        this.dragState.fromCol = null;
+        if (this.touchState.hoverCell) {
+            this.touchState.hoverCell.classList.remove('cell-drag-over');
+            this.touchState.hoverCell = null;
+        }
+
+        // Comprehensive cleanup of all potential floating elements & indicators
+        document.querySelectorAll('.dragging-piece').forEach(el => el.remove());
+        document.querySelectorAll('.cell-drag-over').forEach(el => el.classList.remove('cell-drag-over'));
+
+        this.touchState.isDragging = false;
+        this.touchState.fromRow = null;
+        this.touchState.fromCol = null;
+        this.touchState.targetPiece = null;
     }
 
     bindDrawerListeners() {
@@ -198,6 +265,7 @@ export class CheckersUI {
     }
 
     render(mode = 'pvp') {
+        this.cleanupDrag();
         const board = this.game.board;
         const selected = this.game.selectedPiece;
         const validMoves = this.game.validMoves;
@@ -252,7 +320,7 @@ export class CheckersUI {
                     pieceEl.classList.add('selected-piece');
                 }
 
-                // Touch Start handler for dragging
+                // Touch Start handler for dragging / tapping piece
                 pieceEl.addEventListener('touchstart', (e) => {
                     const actingPlayer = this.game.currentPlayer;
                     const pieceOwner = isRed ? 'red' : 'dark';
@@ -260,22 +328,18 @@ export class CheckersUI {
                     if (actingPlayer !== pieceOwner) return;
 
                     const touch = e.touches[0];
-                    this.dragState.isDragging = true;
-                    this.dragState.fromRow = r;
-                    this.dragState.fromCol = c;
+                    if (!touch) return;
 
-                    if (!selected || selected.row !== r || selected.col !== c) {
-                        if (this.onSquareClick) this.onSquareClick(r, c);
-                    }
+                    this.touchState.startX = touch.clientX;
+                    this.touchState.startY = touch.clientY;
+                    this.touchState.fromRow = r;
+                    this.touchState.fromCol = c;
+                    this.touchState.isDragging = false;
+                    this.touchState.targetPiece = pieceEl;
+                    this.touchState.isKing = isKing;
+                    this.touchState.isRed = isRed;
 
-                    const dragAv = pieceEl.cloneNode(true);
-                    dragAv.className = `piece ${isRed ? 'red-piece' : 'dark-piece'} dragging-piece`;
-                    dragAv.style.left = `${touch.clientX}px`;
-                    dragAv.style.top = `${touch.clientY}px`;
-                    document.body.appendChild(dragAv);
-                    this.dragState.dragElement = dragAv;
-
-                    audio.triggerHaptic(15);
+                    audio.triggerHaptic(10);
                 }, { passive: true });
 
                 cell.appendChild(pieceEl);
@@ -434,6 +498,7 @@ export class CheckersUI {
     }
 
     showWinModal(winner, mode, totalMoves, totalCaptures, totalKings) {
+        this.cleanupDrag();
         const isUserVictory = winner === 'red' || mode === 'pvp';
 
         this.elements.modalBox.className = `modal-box ${isUserVictory ? 'modal-victory' : 'modal-defeat'}`;
@@ -462,6 +527,7 @@ export class CheckersUI {
     }
 
     hideWinModal() {
+        this.cleanupDrag();
         this.elements.winModal.classList.remove('active');
         if (this.elements.confettiCanvas) {
             this.elements.confettiCanvas.style.display = 'none';

@@ -1014,12 +1014,12 @@ body {
     border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
-    transform: translate(-50%, -50%) scale(1.2);
+    transform: translate(-50%, -50%) scale(1.15);
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.05s linear;
+    transition: none !important;
 }
 
 /* MOVE HISTORY DRAWER */
