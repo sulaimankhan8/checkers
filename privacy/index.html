@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#140c08" />
+    <title>Privacy Policy - Checkers Master</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --bg-color: #140c08;
+            --card-bg: rgba(28, 17, 12, 0.92);
+            --border-color: rgba(193, 154, 107, 0.25);
+            --accent-gold: #c19a6b;
+            --accent-wood: #8b5a2b;
+            --text-main: #f5ebe0;
+            --text-muted: #b8a698;
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(193, 154, 107, 0.12) 0%, transparent 60%),
+                linear-gradient(to bottom, #190f0a, #0d0705);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            line-height: 1.7;
+            min-height: 100vh;
+            padding: 2.5rem 1rem;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+        }
+
+        .nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.25rem;
+            background: rgba(193, 154, 107, 0.15);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            background: rgba(193, 154, 107, 0.28);
+            transform: translateX(-3px);
+        }
+
+        .brand-badge {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .header-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-card h1 {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            margin-bottom: 2.2rem;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section h2 {
+            font-family: var(--font-display);
+            color: var(--accent-gold);
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.85rem;
+            border-bottom: 1px solid rgba(193, 154, 107, 0.2);
+            padding-bottom: 0.4rem;
+        }
+
+        .section p {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .section ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 1rem;
+        }
+
+        .section ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.65rem;
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-gold);
+            font-size: 1.3rem;
+            line-height: 1;
+        }
+
+        .highlight-box {
+            background: rgba(193, 154, 107, 0.1);
+            border-left: 4px solid var(--accent-gold);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.25rem 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 640px) {
+            .header-card, .content-card {
+                padding: 1.5rem;
+            }
+            .header-card h1 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-bar">
+            <a href="../" class="btn-back">← Return to Game</a>
+            <div class="brand-badge">Checkers Master</div>
+        </nav>
+
+        <header class="header-card">
+            <h1>Privacy Policy</h1>
+            <div class="header-meta">Last Updated: October 2026 • Checkers Master Web & Mobile Edition</div>
+        </header>
+
+        <main class="content-card">
+            <section class="section">
+                <h2>1. Overview</h2>
+                <p>Welcome to <strong>Checkers Master</strong>. We respect your privacy and provide this policy to explain how our game operates with respect to player privacy, browser data, and device access.</p>
+                <div class="highlight-box">
+                    <p><strong>Privacy Promise:</strong> Checkers Master does not require sign-in, does not collect personal contact information, and processes all board logic and AI matches locally on your device.</p>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>2. Device & Local Storage Usage</h2>
+                <p>The game stores minimal gameplay preferences inside your browser's <code>localStorage</code>:</p>
+                <ul>
+                    <li><strong>Preferences:</strong> Board theme selection (Mahogany, Cyber Neon, Marble), sound effects volume, and music toggle state.</li>
+                    <li><strong>Game Rules:</strong> Mandatory jumps toggle and selected AI difficulty.</li>
+                    <li><strong>Statistics:</strong> Win/loss tally and move history if saved locally.</li>
+                </ul>
+                <p>No telemetry or personal profiles are transmitted to external servers.</p>
+            </section>
+
+            <section class="section">
+                <h2>3. Third-Party CDNs & Fonts</h2>
+                <p>We use Google Fonts to load typography cleanly. Google may collect standard web logs (IP address, user agent) to deliver web fonts reliably. We do not use third-party user-tracking pixels or cross-site tracking cookies.</p>
+            </section>
+
+            <section class="section">
+                <h2>4. Children's Privacy</h2>
+                <p>Checkers Master is family-friendly and suitable for players of all ages. We do not knowingly solicit or collect any personal information from children under 13.</p>
+            </section>
+
+            <section class="section">
+                <h2>5. Managing Your Data</h2>
+                <p>You can reset all stored preferences, stats, and audio settings at any time simply by clearing your browser cache and local storage for this website.</p>
+            </section>
+
+            <section class="section">
+                <h2>6. Inquiries</h2>
+                <p>If you have any questions about this privacy statement, please contact us through the game's open-source repository or project maintainer.</p>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2026 Checkers Master. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
